@@ -1,23 +1,27 @@
-import logo from './logo.svg';
 import './App.css';
+import {db} from './firebase-config'
+import { useEffect, useState } from 'react';
+import {collection, getDocs} from "firebase/firestore"
 
 function App() {
+  const [prices, setPrices] = useState()
+  const pricesCollection = collection(db, 'prices')
+ 
+  useEffect(() => {
+    const getData = async() => {
+      const data = await getDocs(pricesCollection)
+      console.log({data})
+      setPrices(data.docs.map((doc) => ({...doc.data(), id:doc.id})))
+    }
+
+    getData()
+  },[])
+  console.log(prices[0])
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      {prices && prices.map(item => {
+        return <div>comment:{item.comment}</div>
+      })}
     </div>
   );
 }
